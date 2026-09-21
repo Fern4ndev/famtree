@@ -38,7 +38,7 @@ export default function Hero() {
           </span>
         </div>
 
-        <p className="mb-2 text-lg tracking-[0.8em] text-white/70">
+        <p className="mb-0 text-lg tracking-[0.8em] text-white/70">
           PRESERVE YOUR
         </p>
 
@@ -59,7 +59,7 @@ export default function Hero() {
             pointer-events-none"
           />
         </div>
-        <div className="mt-0 flex justify-center">
+        <div className="-mt-15 flex justify-center">
           <Image
             src="/svg/line.svg"
             alt="Separator"
@@ -84,7 +84,7 @@ export default function Hero() {
           interactive trees.
         </p>
 
-        <div className="mt-5 flex flex-wrap items-center justify-center gap-5">
+        <div className="mt-2 flex flex-wrap items-center justify-center gap-5">
 
           <button className="rounded-full bg-gradient-to-b from-[#f9e6c0] to-[#b89a68] px-7 py-3 text-sm font-medium tracking-[0.2em] text-black shadow-[0_0_40px_rgba(255,220,160,0.35)] transition-all hover:scale-105">
             START YOUR JOURNEY
