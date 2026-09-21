@@ -1,6 +1,5 @@
-import NavBar from "../components/layout/NavBar";
 import CustomSplashCursor from '../components/ui/CustomSplashCursor';
-import  Footer from "../components/layout/Footer"; 
+import Footer from "../components/layout/Footer";
 import Hero from "../components/layout/Hero";
 
 export default function Home() {

@@ -48,8 +48,8 @@ export default function Footer() {
                 </a>
               </li>
               <li>
-                <a href="/assets" target="_blank" className="transition-colors hover:text-foreground">
-                  Assets Library
+                <a href="/tree" className="transition-colors hover:text-foreground">
+                  Interactive Tree
                 </a>
               </li>
             </ul>

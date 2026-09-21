@@ -43,21 +43,6 @@ export default function NavBar() {
 
         {/* NAV LINKS */}
         <nav className="hidden items-center gap-8 text-sm font-medium text-neutral-300 md:flex">
-          <Link
-            href="/assets"
-            className="transition-colors hover:text-white py-4"
-          >
-            Assets
-          </Link>
-
-          <a
-            href="https://mail.google.com/mail/?view=cm&fs=1&to=oliverachavezcristian@gmail.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="transition-colors hover:text-white"
-          >
-            Contact
-          </a>
         </nav>
 
         {/* ACTIONS */}
@@ -96,7 +81,7 @@ export default function NavBar() {
           <a
             target="_blank"
             rel="noopener noreferrer"
-            href="https://github.com/FernanDOGozu/"
+            href="https://github.com/Fern4ndev/"
             className="hidden sm:inline-flex items-center"
           >
             <LiquidMetalButton>

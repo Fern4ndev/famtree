@@ -142,7 +142,31 @@ void main(){
   oC=vec4(col*vs,vs);
 }`;
 
-function processImage(img) {
+interface MetallicPaintProps {
+  imageSrc: string;
+  seed?: number;
+  scale?: number;
+  refraction?: number;
+  blur?: number;
+  liquid?: number;
+  speed?: number;
+  brightness?: number;
+  contrast?: number;
+  angle?: number;
+  fresnel?: number;
+  lightColor?: string;
+  darkColor?: string;
+  patternSharpness?: number;
+  waveAmplitude?: number;
+  noiseScale?: number;
+  chromaticSpread?: number;
+  mouseAnimation?: boolean;
+  distortion?: number;
+  contour?: number;
+  tintColor?: string;
+}
+
+function processImage(img: HTMLImageElement) {
   const MAX_SIZE = 1000;
   const MIN_SIZE = 500;
   let width = img.naturalWidth || img.width;
@@ -168,7 +192,7 @@ function processImage(img) {
   const canvas = document.createElement('canvas');
   canvas.width = width;
   canvas.height = height;
-  const ctx = canvas.getContext('2d');
+  const ctx = canvas.getContext('2d')!;
   ctx.drawImage(img, 0, 0, width, height);
 
   const imageData = ctx.getImageData(0, 0, width, height);
@@ -245,7 +269,7 @@ function processImage(img) {
   return outData;
 }
 
-function hexToRgb(hex) {
+function hexToRgb(hex: string): [number, number, number] {
   const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
   return result
     ? [parseInt(result[1], 16) / 255, parseInt(result[2], 16) / 255, parseInt(result[3], 16) / 255]
@@ -274,16 +298,16 @@ export default function MetallicPaint({
   distortion = 1,
   contour = 0.2,
   tintColor = '#feb3ff'
-}) {
-  const canvasRef = useRef(null);
-  const glRef = useRef(null);
-  const programRef = useRef(null);
-  const uniformsRef = useRef({});
-  const textureRef = useRef(null);
+}: MetallicPaintProps) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const glRef = useRef<WebGL2RenderingContext | null>(null);
+  const programRef = useRef<WebGLProgram | null>(null);
+  const uniformsRef = useRef<Record<string, WebGLUniformLocation | null>>({});
+  const textureRef = useRef<WebGLTexture | null>(null);
   const animTimeRef = useRef(0);
   const lastTimeRef = useRef(0);
-  const rafRef = useRef(null);
-  const imgDataRef = useRef(null);
+  const rafRef = useRef<number | null>(null);
+  const imgDataRef = useRef<ImageData | null>(null);
   const speedRef = useRef(speed);
   const mouseRef = useRef({ x: 0.5, y: 0.5, targetX: 0.5, targetY: 0.5 });
   const mouseAnimRef = useRef(mouseAnimation);
@@ -305,8 +329,8 @@ export default function MetallicPaint({
     const gl = canvas.getContext('webgl2', { antialias: true, alpha: true });
     if (!gl) return false;
 
-    const compile = (src, type) => {
-      const s = gl.createShader(type);
+    const compile = (src: string, type: number) => {
+      const s = gl.createShader(type)!;
       gl.shaderSource(s, src);
       gl.compileShader(s);
       if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
@@ -320,7 +344,7 @@ export default function MetallicPaint({
     const fs = compile(fragmentShader, gl.FRAGMENT_SHADER);
     if (!vs || !fs) return false;
 
-    const prog = gl.createProgram();
+    const prog = gl.createProgram()!;
     gl.attachShader(prog, vs);
     gl.attachShader(prog, fs);
     gl.linkProgram(prog);
@@ -329,7 +353,7 @@ export default function MetallicPaint({
       return false;
     }
 
-    const uniforms = {};
+    const uniforms: Record<string, WebGLUniformLocation | null> = {};
     const count = gl.getProgramParameter(prog, gl.ACTIVE_UNIFORMS);
     for (let i = 0; i < count; i++) {
       const info = gl.getActiveUniform(prog, i);
@@ -353,14 +377,14 @@ export default function MetallicPaint({
     return true;
   }, []);
 
-  const uploadTexture = useCallback(imgData => {
+  const uploadTexture = useCallback((imgData: ImageData) => {
     const gl = glRef.current;
     const uniforms = uniformsRef.current;
     if (!gl || !imgData) return;
 
     if (textureRef.current) gl.deleteTexture(textureRef.current);
 
-    const tex = gl.createTexture();
+    const tex = gl.createTexture()!;
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, tex);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
@@ -368,11 +392,11 @@ export default function MetallicPaint({
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, imgData.width, imgData.height, 0, gl.RGBA, gl.UNSIGNED_BYTE, imgData.data);
-    gl.uniform1i(uniforms.u_tex, 0);
+    gl.uniform1i(uniforms.u_tex!, 0);
 
     const ratio = imgData.width / imgData.height;
-    gl.uniform1f(uniforms.u_imgRatio, ratio);
-    gl.uniform1f(uniforms.u_ratio, 1);
+    gl.uniform1f(uniforms.u_imgRatio!, ratio);
+    gl.uniform1f(uniforms.u_ratio!, 1);
 
     textureRef.current = tex;
     imgDataRef.current = imgData;
@@ -381,8 +405,8 @@ export default function MetallicPaint({
   useEffect(() => {
     if (!initGL()) return;
 
-    const canvas = canvasRef.current;
-    const gl = glRef.current;
+    const canvas = canvasRef.current!;
+    const gl = glRef.current!;
     const side = 1000 * devicePixelRatio;
     canvas.width = side;
     canvas.height = side;
@@ -428,28 +452,28 @@ export default function MetallicPaint({
     const u = uniformsRef.current;
     if (!gl || !ready) return;
 
-    gl.uniform1f(u.u_seed, seed);
-    gl.uniform1f(u.u_scale, scale);
-    gl.uniform1f(u.u_refract, refraction);
-    gl.uniform1f(u.u_blur, blur);
-    gl.uniform1f(u.u_liquid, liquid);
-    gl.uniform1f(u.u_bright, brightness);
-    gl.uniform1f(u.u_contrast, contrast);
-    gl.uniform1f(u.u_angle, angle);
-    gl.uniform1f(u.u_fresnel, fresnel);
+    gl.uniform1f(u.u_seed!, seed);
+    gl.uniform1f(u.u_scale!, scale);
+    gl.uniform1f(u.u_refract!, refraction);
+    gl.uniform1f(u.u_blur!, blur);
+    gl.uniform1f(u.u_liquid!, liquid);
+    gl.uniform1f(u.u_bright!, brightness);
+    gl.uniform1f(u.u_contrast!, contrast);
+    gl.uniform1f(u.u_angle!, angle);
+    gl.uniform1f(u.u_fresnel!, fresnel);
 
     const light = hexToRgb(lightColor);
     const dark = hexToRgb(darkColor);
     const tint = hexToRgb(tintColor);
-    gl.uniform3f(u.u_lightColor, light[0], light[1], light[2]);
-    gl.uniform3f(u.u_darkColor, dark[0], dark[1], dark[2]);
-    gl.uniform1f(u.u_sharp, patternSharpness);
-    gl.uniform1f(u.u_wave, waveAmplitude);
-    gl.uniform1f(u.u_noise, noiseScale);
-    gl.uniform1f(u.u_chroma, chromaticSpread);
-    gl.uniform1f(u.u_distort, distortion);
-    gl.uniform1f(u.u_contour, contour);
-    gl.uniform3f(u.u_tint, tint[0], tint[1], tint[2]);
+    gl.uniform3f(u.u_lightColor!, light[0], light[1], light[2]);
+    gl.uniform3f(u.u_darkColor!, dark[0], dark[1], dark[2]);
+    gl.uniform1f(u.u_sharp!, patternSharpness);
+    gl.uniform1f(u.u_wave!, waveAmplitude);
+    gl.uniform1f(u.u_noise!, noiseScale);
+    gl.uniform1f(u.u_chroma!, chromaticSpread);
+    gl.uniform1f(u.u_distort!, distortion);
+    gl.uniform1f(u.u_contour!, contour);
+    gl.uniform3f(u.u_tint!, tint[0], tint[1], tint[2]);
   }, [
     ready,
     seed,
@@ -477,10 +501,10 @@ export default function MetallicPaint({
 
     const gl = glRef.current;
     const u = uniformsRef.current;
-    const canvas = canvasRef.current;
+    const canvas = canvasRef.current!;
     const mouse = mouseRef.current;
 
-    const handleMouseMove = e => {
+    const handleMouseMove = (e: MouseEvent) => {
       const rect = canvas.getBoundingClientRect();
       mouse.targetX = (e.clientX - rect.left) / rect.width;
       mouse.targetY = (e.clientY - rect.top) / rect.height;
@@ -488,7 +512,7 @@ export default function MetallicPaint({
 
     canvas.addEventListener('mousemove', handleMouseMove);
 
-    const render = time => {
+    const render = (time: number) => {
       const delta = time - lastTimeRef.current;
       lastTimeRef.current = time;
 
@@ -500,8 +524,8 @@ export default function MetallicPaint({
         animTimeRef.current += delta * speedRef.current;
       }
 
-      gl.uniform1f(u.u_time, animTimeRef.current);
-      gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+      gl!.uniform1f(u.u_time!, animTimeRef.current);
+      gl!.drawArrays(gl!.TRIANGLE_STRIP, 0, 4);
       rafRef.current = requestAnimationFrame(render);
     };
 
