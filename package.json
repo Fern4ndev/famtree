@@ -9,6 +9,9 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@fontsource/cinzel": "^5.2.8",
+    "@iconify/react": "^6.0.2",
+    "@paper-design/shaders": "^0.0.76",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^1.16.0",

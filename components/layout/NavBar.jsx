@@ -1,11 +1,12 @@
 "use client";
 import MetallicPaint from "@/components/ui/MetallicPaint";
+import { LiquidMetalButton } from "@/components/ui/LiquidMetalButton";
 import Link from "next/link";
 
 
 export default function NavBar() {
   return (
-    <header className="fixed top-0 z-50 w-full border-b border-white/10 bg-black/80 backdrop-blur-xl transition-all duration-300 animate-fade-in">
+    <header className="fixed top-0 z-50 w-full border-b border-white/10 bg-black/40 backdrop-blur-xl transition-all duration-300 animate-fade-in">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
         {/* LOGO */}
         <Link href="/" className="group flex items-center z-50">
@@ -62,8 +63,8 @@ export default function NavBar() {
         {/* ACTIONS */}
         <div className="flex items-center gap-3">
           {/* SUBMIT BUTTON */}
-          <button className="group relative hidden sm:inline-flex items-center justify-center rounded-full px-5 py-3 mb-1 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] shadow-[0_4px_10px_rgba(0,0,0,0.2)] hover:shadow-[0_10px_20px_rgba(0,0,0,0.3)] border border-white/20 text-white backdrop-blur-lg">
-            <div className="relative z-20 flex items-center gap-1.5 text-[#f9f9f9] drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]">
+          <LiquidMetalButton>
+            <div className="relative z-20 flex items-center gap-2 text-[#f9f9f9] drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="16"
@@ -89,17 +90,17 @@ export default function NavBar() {
                 Submit
               </span>
             </div>
-          </button>
+          </LiquidMetalButton>
 
           {/* GITHUB BUTTON */}
           <a
             target="_blank"
             rel="noopener noreferrer"
             href="https://github.com/FernanDOGozu/"
-            className="hidden sm:block"
+            className="hidden sm:inline-flex items-center"
           >
-            <button className="group relative overflow-hidden rounded-full border border-white/15 bg-neutral-900 px-5 py-3 text-white transition-all duration-300 hover:scale-105 hover:border-white/30 hover:bg-neutral-800">
-              <span className="relative z-10 flex items-center gap-2">
+            <LiquidMetalButton>
+              <span className="flex items-center gap-2 text-[#dddddd] drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)] transition-colors hover:text-white">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="18"
@@ -114,9 +115,7 @@ export default function NavBar() {
                   GitHub
                 </span>
               </span>
-
-              <div className="absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.18),transparent_70%)]"></div>
-            </button>
+            </LiquidMetalButton>
           </a>
 
           {/* MOBILE MENU BUTTON */}
