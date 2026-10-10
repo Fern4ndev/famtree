@@ -1,5 +1,344 @@
 @import url('https://fonts.googleapis.com/css2?family=Google+Sans:ital,opsz,wght@0,17..18,400..700;1,17..18,400..700&display=swap');
 @import "tailwindcss";
+/* ==========================================================================
+   Holo Card —  
+   ========================================================================== */
+
+@property --pointer-x { syntax: '<percentage>'; inherits: true; initial-value: 50%; }
+@property --pointer-y { syntax: '<percentage>'; inherits: true; initial-value: 50%; }
+@property --background-x { syntax: '<percentage>'; inherits: true; initial-value: 50%; }
+@property --background-y { syntax: '<percentage>'; inherits: true; initial-value: 50%; }
+@property --card-opacity { syntax: '<number>'; inherits: true; initial-value: 0; }
+@property --pointer-from-center { syntax: '<number>'; inherits: true; initial-value: 0; }
+
+.poke-card {
+  --grain: none;
+  --glitter: none;
+  --glittersize: 25%;
+
+  --space: 5%;
+  --angle: 133deg;
+  --imgsize: cover;
+
+  --clip: inset(9.85% 8% 52.85% 8%);
+  --clip-stage: polygon(91.5% 9.85%, 57% 9.85%, 54% 12%, 17% 12%, 16% 14%, 12% 16%, 8% 16%, 8% 47.15%, 92% 47.15%);
+  --clip-trainer: inset(14.5% 8.5% 48.2% 8.5%);
+  --clip-borders: inset(2.8% 4% round 2.55% / 1.5%);
+
+  --card-aspect: 0.718;
+  --card-radius: 4.55% / 3.5%;
+  --card-edge: hsl(47, 100%, 78%);
+  --card-back: hsl(205, 100%, 25%);
+  --card-glow: hsl(175, 100%, 90%);
+
+  --sunpillar-1: hsl(2, 100%, 73%);
+  --sunpillar-2: hsl(53, 100%, 69%);
+  --sunpillar-3: hsl(93, 100%, 69%);
+  --sunpillar-4: hsl(176, 100%, 76%);
+  --sunpillar-5: hsl(228, 100%, 74%);
+  --sunpillar-6: hsl(283, 100%, 73%);
+
+  --sunpillar-clr-1: var(--sunpillar-1);
+  --sunpillar-clr-2: var(--sunpillar-2);
+  --sunpillar-clr-3: var(--sunpillar-3);
+  --sunpillar-clr-4: var(--sunpillar-4);
+  --sunpillar-clr-5: var(--sunpillar-5);
+  --sunpillar-clr-6: var(--sunpillar-6);
+
+  --pointer-x: 50%;
+  --pointer-y: 50%;
+  --card-scale: 1;
+  --card-opacity: 0;
+  --translate-x: 0px;
+  --translate-y: 0px;
+  --rotate-x: 0deg;
+  --rotate-y: 0deg;
+  --background-x: 50%;
+  --background-y: 50%;
+  --pointer-from-center: 0;
+  --pointer-from-top: 0;
+  --pointer-from-left: 0;
+
+  transform: translate3d(0px, 0px, 0.01px);
+  z-index: calc(var(--card-scale) * 2);
+  will-change: transform, visibility, z-index;
+  transform-style: preserve-3d;
+  aspect-ratio: var(--card-aspect);
+  border-radius: var(--card-radius);
+}
+
+.poke-card, .poke-card * {
+  outline: 1px solid transparent; /* anti-alias */
+}
+
+/* Glow por tipo */
+.poke-card.fire      { --card-glow: hsl(9, 81%, 59%); }
+.poke-card.water     { --card-glow: hsl(192, 97%, 60%); }
+.poke-card.grass     { --card-glow: hsl(96, 81%, 65%); }
+.poke-card.lightning { --card-glow: hsl(54, 87%, 63%); }
+.poke-card.psychic   { --card-glow: hsl(281, 62%, 58%); }
+.poke-card.fighting  { --card-glow: rgb(145, 90, 39); }
+.poke-card.darkness  { --card-glow: hsl(189, 77%, 27%); }
+.poke-card.metal     { --card-glow: hsl(184, 20%, 70%); }
+.poke-card.dragon    { --card-glow: hsl(51, 60%, 35%); }
+.poke-card.fairy     { --card-glow: hsl(323, 100%, 89%); }
+
+.poke-card.interacting { z-index: calc(var(--card-scale) * 120); }
+
+.poke-card__translater,
+.poke-card__rotator {
+  display: grid;
+  perspective: 600px;
+  will-change: transform, box-shadow;
+  transform-origin: center;
+  transform-style: preserve-3d;
+}
+
+.poke-card__translater {
+  width: auto;
+  position: relative;
+  --translate-z: calc(var(--card-scale) * 150px + 0.01px);
+  transform: translate3d(var(--translate-x), var(--translate-y), var(--translate-z)) scale(var(--card-scale));
+  transition: transform 0.4s cubic-bezier(.16,1,.3,1);
+}
+
+.poke-card__rotator {
+  transform: rotateY(var(--rotate-x)) rotateX(var(--rotate-y));
+  transform-style: preserve-3d;
+  pointer-events: auto;
+  border: none;
+  background: transparent;
+  padding: 0;
+  appearance: none;
+  cursor: pointer;
+  width: 100%;
+  aspect-ratio: var(--card-aspect);
+  border-radius: var(--card-radius);
+  transition: transform 0.6s cubic-bezier(.16,1,.3,1),
+              box-shadow 0.4s ease, opacity .33s ease-out;
+  box-shadow:
+    0 0 3px -1px transparent,
+    0 0 2px 1px transparent,
+    0 0 5px 0px transparent,
+    0px 10px 20px -5px black,
+    0 2px 15px -5px black,
+    0 0 20px 0px transparent;
+}
+
+.poke-card.interacting .poke-card__rotator {
+  transition: box-shadow 0.4s ease, opacity .33s ease-out; /* sin lag al mover el puntero */
+}
+
+.poke-card.active .poke-card__rotator,
+.poke-card__rotator:focus-visible {
+  box-shadow:
+    0 0 3px -1px white,
+    0 0 3px 1px var(--card-edge),
+    0 0 12px 2px var(--card-glow),
+    0px 10px 20px -5px black,
+    0 0 40px -30px var(--card-glow),
+    0 0 50px -20px var(--card-glow);
+}
+
+.poke-card__rotator * {
+  width: 100%;
+  display: grid;
+  grid-area: 1/1;
+  aspect-ratio: var(--card-aspect);
+  border-radius: var(--card-radius);
+  transform-style: preserve-3d;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.poke-card__front {
+  opacity: 1;
+  transition: opacity 0.33s ease-out;
+  transform: translate3d(0px, 0px, 0.01px);
+  background: #111;
+}
+
+.poke-card__art {
+  object-fit: cover;
+}
+
+.poke-card__shine {
+  display: grid;
+  transform: translateZ(1px);
+  overflow: hidden;
+  z-index: 3;
+  background: transparent;
+  background-size: cover;
+  background-position: center;
+  filter: brightness(.85) contrast(2.75) saturate(.65);
+  mix-blend-mode: color-dodge;
+  opacity: var(--card-opacity);
+}
+
+.poke-card__shine::before,
+.poke-card__shine::after {
+  --sunpillar-clr-1: var(--sunpillar-5);
+  --sunpillar-clr-2: var(--sunpillar-6);
+  --sunpillar-clr-3: var(--sunpillar-1);
+  --sunpillar-clr-4: var(--sunpillar-2);
+  --sunpillar-clr-5: var(--sunpillar-3);
+  --sunpillar-clr-6: var(--sunpillar-4);
+  grid-area: 1/1;
+  transform: translateZ(1px);
+  border-radius: var(--card-radius);
+}
+
+.poke-card__shine::after {
+  --sunpillar-clr-1: var(--sunpillar-6);
+  --sunpillar-clr-2: var(--sunpillar-1);
+  --sunpillar-clr-3: var(--sunpillar-2);
+  --sunpillar-clr-4: var(--sunpillar-3);
+  --sunpillar-clr-5: var(--sunpillar-4);
+  --sunpillar-clr-6: var(--sunpillar-5);
+  transform: translateZ(1.2px);
+}
+
+.poke-card__glare {
+  transform: translateZ(1.41px);
+  overflow: hidden;
+  background-image: radial-gradient(
+    farthest-corner circle at var(--pointer-x) var(--pointer-y),
+    hsla(0, 0%, 100%, 0.8) 10%,
+    hsla(0, 0%, 100%, 0.65) 20%,
+    hsla(0, 0%, 0%, 0.5) 90%
+  );
+  opacity: var(--card-opacity);
+  mix-blend-mode: overlay;
+}
+
+/* Máscara — recorta el brillo a la silueta del arte (necesita --mask real) */
+.poke-card.masked .poke-card__shine,
+.poke-card.masked .poke-card__shine::before,
+.poke-card.masked .poke-card__shine::after {
+  -webkit-mask-image: var(--mask, none);
+  mask-image: var(--mask, none);
+  -webkit-mask-size: cover;
+  mask-size: cover;
+  -webkit-mask-position: center center;
+  mask-position: center center;
+}
+
+/* ==========================================================================
+   RARE SHINY VMAX
+   ========================================================================== */
+.poke-card[data-rarity="rare shiny vmax"] .poke-card__shine {
+  --imgsize: cover;
+  --angle: -30deg;
+
+  --r-clr-1: hsl(0, 57%, 37%);
+  --r-clr-2: hsl(40, 53%, 39%);
+  --r-clr-3: hsl(90, 60%, 35%);
+  --r-clr-4: hsl(180, 60%, 35%);
+  --r-clr-5: hsl(180, 60%, 35%);
+  --r-clr-6: hsl(210, 57%, 39%);
+  --r-clr-7: hsl(280, 55%, 31%);
+
+  background-image:
+    var(--glitter),
+    var(--glitter),
+    linear-gradient(var(--angle),
+      var(--r-clr-1), var(--r-clr-2), var(--r-clr-3), var(--r-clr-4), var(--r-clr-5), var(--r-clr-6), var(--r-clr-7),
+      var(--r-clr-1), var(--r-clr-2), var(--r-clr-3), var(--r-clr-4), var(--r-clr-5), var(--r-clr-6), var(--r-clr-7),
+      var(--r-clr-1), var(--r-clr-2), var(--r-clr-3), var(--r-clr-4), var(--r-clr-5), var(--r-clr-6), var(--r-clr-7),
+      var(--r-clr-1)
+    ),
+    radial-gradient(
+      farthest-corner circle at var(--pointer-x) var(--pointer-y),
+      hsla(248, 5%, 10%, 1) 10%,
+      hsla(206, 5%, 80%, 0.1) 50%,
+      hsla(0, 0%, 95%, .98) 90%
+    );
+
+  background-size: var(--glittersize) var(--glittersize), var(--glittersize) var(--glittersize), 400% 400%, cover;
+  background-position: 40% 45%, 55% 55%, calc(var(--background-x) * 1.5) calc(var(--background-y) * 1.5), center center;
+  background-blend-mode: soft-light, overlay, color-burn;
+  filter: brightness(1) contrast(1) saturate(.85);
+}
+
+.poke-card[data-rarity="rare shiny vmax"] .poke-card__shine::before {
+  content: "";
+  -webkit-mask-image: none !important;
+  mask-image: none !important;
+
+  background-image:
+    var(--foil, none),
+    radial-gradient(
+      farthest-corner circle at var(--pointer-x) var(--pointer-y),
+      hsla(248, 5%, 91%, 0.95) 10%,
+      hsla(206, 5%, 68%, 0.5) 50%,
+      hsl(0, 0%, 0%) 120%
+    );
+
+  background-size: var(--imgsize), cover;
+  background-position: center center, center center;
+  background-blend-mode: color-burn;
+
+  mix-blend-mode: lighten;
+  filter: brightness(1) contrast(1) saturate(.4);
+  opacity: 0.35;
+}
+
+.poke-card[data-rarity="rare shiny vmax"] .poke-card__shine::after {
+  content: "";
+  -webkit-mask-image: none !important;
+  mask-image: none !important;
+
+  background-image:
+    repeating-linear-gradient(
+      calc(var(--angle)),
+      var(--sunpillar-clr-1) calc(var(--space)*1),
+      var(--sunpillar-clr-2) calc(var(--space)*2),
+      var(--sunpillar-clr-3) calc(var(--space)*3),
+      var(--sunpillar-clr-4) calc(var(--space)*4),
+      var(--sunpillar-clr-5) calc(var(--space)*5),
+      var(--sunpillar-clr-6) calc(var(--space)*6),
+      var(--sunpillar-clr-1) calc(var(--space)*7)
+    );
+
+  background-size: 400% 800%;
+  background-position: calc(50% + (50% - (var(--background-x))) * 3) calc(50% + (50% - (var(--background-y))) * 3);
+  filter: brightness(calc(0.75 - (var(--pointer-from-center) * 0.5))) contrast(1) saturate(1);
+  mix-blend-mode: hue;
+}
+
+.poke-card[data-rarity="rare shiny vmax"] .poke-card__glare {
+  background-image:
+    radial-gradient(
+      farthest-corner circle at
+      var(--pointer-x) var(--pointer-y),
+      hsla(248, 5%, 90%, 0.45) 0%,
+      hsla(206, 5%, 30%, 0.45) 45%,
+      hsla(0, 0%, 0%, .33) 120%
+    );
+  filter: brightness(1) contrast(1.25);
+}
+
+.poke-card[data-rarity="rare shiny vmax"] .poke-card__glare::after {
+  content: "";
+  -webkit-mask-image: var(--mask, none);
+  mask-image: var(--mask, none);
+  -webkit-mask-size: cover;
+  mask-size: cover;
+
+  background-image:
+    radial-gradient(
+      farthest-corner circle at
+      var(--pointer-x) var(--pointer-y),
+      hsla(248, 5%, 90%, 0.75) 0%,
+      hsla(206, 5%, 30%, 0.65) 45%,
+      hsla(0, 0%, 0%, .75) 100%
+    );
+
+  filter: brightness(1) contrast(1.25);
+  mix-blend-mode: overlay;
+  opacity: 1;
+}
+
 :root {
   --background: #ffffff;
   --foreground: #171717;

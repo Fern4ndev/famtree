@@ -2,7 +2,6 @@ import NavBar from "../../components/layout/NavBar";
 import CustomSplashCursor from '../../components/ui/CustomSplashCursor';
 import DevCard from "../components/FamilyCard";
 
-
 export default function CardPage() {
   return (
     <>
