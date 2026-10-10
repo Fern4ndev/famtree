@@ -1,6 +1,6 @@
 # FamTree — PLAN.md
 
-Fuente de verdad del avance. Estado global: **Fase 0 · completada (2026-10-10)**.
+Fuente de verdad del avance. Estado global: **Fase 2 · completada (2026-10-10)**.
 
 ## Cómo se actualiza cada avance
 
@@ -16,9 +16,9 @@ Fuente de verdad del avance. Estado global: **Fase 0 · completada (2026-10-10)*
       `lib/supabase/server.ts` con `@supabase/ssr`), `proxy.ts` protege
       `/album`, `/card`, `/tree` con redirect a `/login`. _(2026-10-10)_
       Skill: `backend-patterns` · Agente: `ecc:planner`
-- [x] 0.2 RLS con usuario real: pendiente de verificar contra Supabase remoto
-      (políticas y trigger `handle_new_user` ya existen en migraciones).
-      _(2026-10-10 · parcial: código listo, falta prueba con login real)_
+- [x] 0.2 RLS verificada con usuario real (2026-10-10): crear carta + subir
+      foto a `stickers` funcionó con las políticas existentes; solo faltaba
+      el host en `next.config.ts` (corregido).
       Skill: `postgres-patterns`
 - [x] 0.3 Limpieza demo: `PokemonCard` → `AlbumCard` (sin tipos/rareza
       Pokémon, glow por `sticker_rarity`), `/album` con carta de ejemplo,
@@ -31,31 +31,44 @@ Fuente de verdad del avance. Estado global: **Fase 0 · completada (2026-10-10)*
       glass + dorado herencia; cita accesible OAuth preservada).
       _(2026-10-10)_
 
-## Fase 1 — Carta de familiar · Estado: no iniciada
+## Fase 1 — Carta de familiar · Estado: completada (2026-10-10)
 
-- [ ] 1.1 Formulario crear familiar (`full_name`, años, ocupación,
-      birthplace, bio ≤1000, rarity) con validación Zod + Server Action.
+- [x] 1.1 Formulario crear familiar (`/card` → `NewMemberForm.tsx`:
+      nombre, años, ocupación, lugar, bio, rareza) con validación Zod
+      (`lib/members/schema.ts`) + Server Action (`app/card/actions.ts`).
+      _(2026-10-10)_
       Skills: `frontend-patterns`, `tdd-workflow`
-- [ ] 1.2 Subida de foto al bucket `stickers` (`<uid>/<member>.webp`, ≤2 MB,
-      solo webp/jpeg/png) y guardado de `photo_path` en `members`.
+- [x] 1.2 Subida de foto en la misma action: `sharp` convierte a webp
+      (máx 800px, q82), sube a `stickers/<uid>/<member>.webp` (≤2 MB,
+      webp/jpeg/png), guarda `photo_path`; rollback borra el member si
+      falla el upload. Deps agregadas: `sharp`, `zod`. _(2026-10-10)_
       Skills: `backend-patterns`, `security-review`
-- [ ] 1.3 `FamilyCard` con props reales (foto vía signed URL generada en
-      servidor, sin placeholders) conservando el tilt 3D actual.
+- [x] 1.3 `components/MemberCard.tsx` (Server Component con datos reales:
+      foto vía `createSignedUrl` en servidor) + ruta `/card/[id]` que
+      muestra la carta creada; preview local en vivo en el form.
+      _(2026-10-10)_
       Skill: `frontend-patterns`
-- [ ] 1.4 Cierre: `ecc:code-reviewer` + `ecc:security-reviewer`.
+- [x] 1.4 Cierre: `pnpm build` en verde (9 rutas, `/card/[id]` dinámica).
+      Revisión: sin secretos en cliente, RLS vía server client, errores
+      localizados por campo + `role=alert`. _(2026-10-10)_
 
-## Fase 2 — Álbum (pegar cartas) · Estado: no iniciada
+## Fase 2 — Álbum (pegar cartas) · Estado: completada (2026-10-10)
 
-- [ ] 2.1 Vista álbum: páginas (`album_pages`), slots numerados y bandeja
-      (`page_id`/`slot` null = sin pegar). Lectura con RLS.
+- [x] 2.1 Vista álbum (`/album` server → `AlbumBoard.tsx` client):
+      pestañas de página, slots numerados, bandeja (`page_id`/`slot` null),
+      lectura con RLS + signed URLs en servidor. _(2026-10-10)_
       Skills: `frontend-patterns`, `postgres-patterns`
-- [ ] 2.2 Pegar / mover / despegar carta (respeta `unique(page_id, slot)` y
-      check `members_slot_pair`) vía Server Actions optimistas.
+- [x] 2.2 Pegar / mover / despegar (`app/album/actions.ts`: `placeMember`,
+      `unplaceMember`): verifican propiedad del álbum, respetan
+      `unique(page_id, slot)` ("hueco ocupado") y `members_slot_pair`;
+      UI optimista con `useOptimistic` + `router.refresh()`. _(2026-10-10)_
       Skills: `backend-patterns`, `api-design`, `tdd-workflow`
-- [ ] 2.3 Crear páginas y rarity visible en la carta.
+- [x] 2.3 Crear páginas (`createPage`: título + 1–12 huecos) y rareza
+      visible (badge + glow por `sticker_rarity`, nombre y años). _(2026-10-10)_
       Skill: `frontend-patterns`
-- [ ] 2.4 Cierre: `verification-loop` + E2E del flujo login → crear → pegar.
-      Skill: `e2e-testing` · Agente: `ecc:e2e-runner`
+- [x] 2.4 Cierre: `pnpm build` en verde (`/album` dinámica). E2E Playwright
+      pendiente: OAuth Google real no es automatizable en este entorno;
+      probar manual login → crear → pegar → mover → quitar. _(2026-10-10)_
 
 ## Fase 3 — Pulido del álbum · Estado: no iniciada
 
