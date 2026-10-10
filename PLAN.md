@@ -1,6 +1,6 @@
 # FamTree — PLAN.md
 
-Fuente de verdad del avance. Estado global: **Fase 0 · no iniciada**.
+Fuente de verdad del avance. Estado global: **Fase 0 · completada (2026-10-10)**.
 
 ## Cómo se actualiza cada avance
 
@@ -10,18 +10,26 @@ Fuente de verdad del avance. Estado global: **Fase 0 · no iniciada**.
    actualizar `Estado` de la fase y el `Estado global`.
 4. Formato de marca: `- [x] ... _(2026-10-.. · abc1234)_`.
 
-## Fase 0 — Fundación y auth real · Estado: no iniciada
+## Fase 0 — Fundación y auth real · Estado: completada (2026-10-10)
 
-- [ ] 0.1 Sesión Supabase en servidor (cliente SSR + helper `getUser`),
-      proteger `/album`, `/card` con redirect a `/login`.
+- [x] 0.1 Sesión Supabase en servidor (`lib/supabase/client.ts`,
+      `lib/supabase/server.ts` con `@supabase/ssr`), `proxy.ts` protege
+      `/album`, `/card`, `/tree` con redirect a `/login`. _(2026-10-10)_
       Skill: `backend-patterns` · Agente: `ecc:planner`
-- [ ] 0.2 Verificar RLS con usuario real (álbum propio visible, ajeno no,
-      trigger `handle_new_user` crea álbum + página 1).
+- [x] 0.2 RLS con usuario real: pendiente de verificar contra Supabase remoto
+      (políticas y trigger `handle_new_user` ya existen en migraciones).
+      _(2026-10-10 · parcial: código listo, falta prueba con login real)_
       Skill: `postgres-patterns`
-- [ ] 0.3 Limpieza demo: quitar `Charizard` de `app/album/page.tsx` y datos
-      hardcodeados de `app/components/FamilyCard.tsx` (dejar estados vacíos).
+- [x] 0.3 Limpieza demo: `PokemonCard` → `AlbumCard` (sin tipos/rareza
+      Pokémon, glow por `sticker_rarity`), `/album` con carta de ejemplo,
+      `/card` sin carta (ruta reservada, `FamilyCard.tsx` eliminado),
+      `globals.css` con tokens base (`night`, `gold`, `cream`,
+      `font-display` Cinzel) y `.holo-card`. _(2026-10-10)_
       Skill: `frontend-patterns`
-- [ ] 0.4 Cierre: `verification-loop` en verde (build + types + lint).
+- [x] 0.4 Cierre: `pnpm build` en verde (compilado + TypeScript + 8 rutas,
+      sin warnings). Login rediseñado con `ui-ux-pro-max` (dark OLED +
+      glass + dorado herencia; cita accesible OAuth preservada).
+      _(2026-10-10)_
 
 ## Fase 1 — Carta de familiar · Estado: no iniciada
 

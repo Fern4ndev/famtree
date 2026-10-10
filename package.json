@@ -12,6 +12,7 @@
     "@fontsource/cinzel": "^5.2.8",
     "@iconify/react": "^6.0.2",
     "@paper-design/shaders": "^0.0.76",
+    "@supabase/ssr": "^0.12.7",
     "@supabase/supabase-js": "^2.117.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",

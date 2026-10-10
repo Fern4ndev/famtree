@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import "@fontsource/cinzel/400.css";
+import "@fontsource/cinzel/700.css";
 import "./globals.css";
 import { ThemeProvider } from "next-themes";
 

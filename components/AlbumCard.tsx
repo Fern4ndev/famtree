@@ -4,35 +4,18 @@ import { useCallback, useRef } from "react";
 import Image from "next/image";
 
 /**
- * Tipos de Pokémon soportados por el glow del borde (definidos en
- * pokemon-card.css). Agrega más si los necesitas.
+ * Rareza de la carta — mismo enum que `public.sticker_rarity` en Supabase.
+ * Solo `legendary` tiene lámina completa (ver globals.css).
  */
-export type PokemonType =
-  | "fire"
-  | "water"
-  | "grass"
-  | "lightning"
-  | "psychic"
-  | "fighting"
-  | "darkness"
-  | "metal"
-  | "dragon"
-  | "fairy";
+export type AlbumRarity = "common" | "rare" | "epic" | "legendary";
 
-export interface PokemonCardProps {
-  /** Nombre del Pokémon, usado para el alt de la imagen */
+export interface AlbumCardProps {
+  /** Nombre del familiar, usado para el alt de la imagen */
   name: string;
-  /** URL de la imagen del frente de la carta */
+  /** URL de la foto del familiar */
   imageUrl: string;
-  /** Tipo principal, define el color del glow al hacer focus/activar */
-  type?: PokemonType;
-  /**
-   * Rareza tal cual la usa el CSS original, ej. "rare shiny vmax".
-   * Por ahora el CSS incluido solo trae reglas para esta rareza;
-   * agrega el resto de los archivos de public/css/cards/*.css a
-   * pokemon-card.css si quieres soportar otras.
-   */
-  rarity?: string;
+  /** Rareza, define el color del glow al hacer focus/activar */
+  rarity?: AlbumRarity;
   /**
    * PNG/WEBP que define la silueta a recortar del brillo (--mask).
    * Sin esto, el brillo cubre toda la carta en vez de solo el arte.
@@ -53,15 +36,14 @@ function adjust(value: number, fromMin: number, fromMax: number, toMin: number, 
   return round(toMin + ((value - fromMin) * (toMax - toMin)) / (fromMax - fromMin));
 }
 
-export default function PokemonCard({
+export default function AlbumCard({
   name,
   imageUrl,
-  type = "fire",
-  rarity = "rare shiny vmax",
+  rarity = "common",
   maskUrl,
   foilUrl,
   className = "",
-}: PokemonCardProps) {
+}: AlbumCardProps) {
   const cardRef = useRef<HTMLDivElement>(null);
   const rotatorRef = useRef<HTMLButtonElement>(null);
 
@@ -124,15 +106,15 @@ export default function PokemonCard({
     <div className={`mx-auto w-full max-w-[300px] ${className}`}>
       <div
         ref={cardRef}
-        className={`poke-card ${type} masked`}
+        className={`holo-card ${rarity} masked`}
         data-rarity={rarity}
       >
-        <div className="poke-card__translater">
+        <div className="holo-card__translater">
           <button
             ref={rotatorRef}
             type="button"
-            className="poke-card__rotator"
-            aria-label={`Carta Pokémon de ${name}`}
+            className="holo-card__rotator"
+            aria-label={`Carta de ${name}`}
             onPointerMove={(e) => handleMove(e.clientX, e.clientY)}
             onPointerLeave={resetCard}
             onTouchMove={(e) => {
@@ -141,17 +123,17 @@ export default function PokemonCard({
             }}
             onTouchEnd={resetCard}
           >
-            <div className="poke-card__front" style={foilStyle}>
+            <div className="holo-card__front" style={foilStyle}>
               <Image
                 src={imageUrl}
-                alt={`Arte de la carta de ${name}`}
+                alt={`Foto de ${name}`}
                 fill
                 sizes="300px"
-                className="poke-card__art"
+                className="holo-card__art"
                 priority
               />
-              <div className="poke-card__shine" />
-              <div className="poke-card__glare" />
+              <div className="holo-card__shine" />
+              <div className="holo-card__glare" />
             </div>
           </button>
         </div>
