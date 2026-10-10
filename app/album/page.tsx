@@ -1,14 +1,27 @@
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import NavBar from "@/components/layout/NavBar";
 import AlbumBoard from "@/components/AlbumBoard";
+import AlbumSettings from "@/components/AlbumSettings";
 import { createClient, getUser } from "@/lib/supabase/server";
-import { getOrCreateAlbum } from "@/lib/members/album";
+import { getOrCreateAlbum, isAlbumTheme } from "@/lib/members/album";
 
 export default async function AlbumPage() {
   const user = await getUser();
   if (!user) redirect("/login");
   const supabase = await createClient();
   const albumId = await getOrCreateAlbum(supabase, user.id);
+
+  const { data: album } = await supabase
+    .from("albums")
+    .select("id, title, slug, theme, is_public")
+    .eq("id", albumId)
+    .single();
+  if (!album) redirect("/login");
+
+  const theme = isAlbumTheme(album.theme) ? album.theme : "sepia";
+  const host = (await headers()).get("host") ?? "";
+  const shareUrl = `https://${host}/a/${album.slug as string}`;
 
   const { data: pages } = await supabase
     .from("album_pages")
@@ -49,14 +62,29 @@ export default async function AlbumPage() {
   return (
     <>
       <NavBar />
-      <main className="flex min-h-screen flex-col items-center bg-night-950 px-6 py-24 text-white">
-        <div className="w-full max-w-6xl text-center">
+      <main
+        className={`album-theme-${theme} relative flex min-h-screen flex-col items-center overflow-hidden bg-night-950 px-6 py-24 text-white`}
+      >
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute left-1/2 top-0 h-[300px] w-[600px] -translate-x-1/2 rounded-full blur-3xl"
+          style={{ background: "var(--veil)" }}
+        />
+        <div className="relative w-full max-w-6xl text-center">
           <p className="text-[11px] tracking-[0.4em] text-white/60">TU ÁLBUM</p>
-          <h1 className="mt-3 font-display text-3xl text-gold-200 sm:text-4xl">
-            Tus páginas
+          <h1 className="mt-3 font-display text-3xl text-[var(--acc)] sm:text-4xl">
+            {album.title as string}
           </h1>
         </div>
-        <div className="mt-8 flex w-full justify-center">
+
+        <AlbumSettings
+          title={album.title as string}
+          theme={theme}
+          isPublic={(album.is_public as boolean) ?? false}
+          shareUrl={shareUrl}
+        />
+
+        <div className="relative mt-8 flex w-full justify-center">
           <AlbumBoard
             pages={(pages ?? []).map((p) => ({
               id: p.id as string,

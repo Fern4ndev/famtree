@@ -391,3 +391,39 @@ body {
     transform: translateY(0px);
   }
 }
+
+/* ==========================================================================
+   FamTree — temas de álbum (columna `albums.theme`).
+   Los títulos y acentos usan var(--acc); el dorado queda como base sepia.
+   ========================================================================== */
+.album-theme-sepia {
+  --acc: #f3d28c;
+  --acc-soft: rgba(215, 185, 142, 0.15);
+  --veil: rgba(255, 220, 160, 0.1);
+}
+.album-theme-midnight {
+  --acc: #bcd2ff;
+  --acc-soft: rgba(150, 180, 255, 0.15);
+  --veil: rgba(150, 180, 255, 0.1);
+}
+.album-theme-bosque {
+  --acc: #c4e6c8;
+  --acc-soft: rgba(150, 210, 165, 0.15);
+  --veil: rgba(150, 210, 165, 0.1);
+}
+
+/* Foco visible global para navegación por teclado */
+:where(a, button, input, select, textarea):focus-visible {
+  outline: 2px solid var(--color-gold-200);
+  outline-offset: 2px;
+}
+
+/* Respeta reduced-motion (cartas holo, splash, animaciones) */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

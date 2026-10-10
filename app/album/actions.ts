@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
-import { getOrCreateAlbum } from "@/lib/members/album";
+import { getOrCreateAlbum, isAlbumTheme } from "@/lib/members/album";
 
 export interface AlbumActionResult {
   ok: boolean;
@@ -75,8 +75,7 @@ export async function unplaceMember(
   return { ok: true };
 }
 
-/** Crea una página nueva al final del álbum. */
-export async function createPage(
+/** Crea una página nueva al final del álbum. */export async function createPage(
   formData: FormData
 ): Promise<AlbumActionResult> {
   const ctx = await ownedAlbumId();
@@ -110,4 +109,30 @@ export async function createPage(
   if (error || !page) return { ok: false, error: "No se pudo crear la página" };
   revalidatePath("/album");
   return { ok: true, pageId: page.id as string };
+}
+
+/** Título, tema y visibilidad del álbum propio. */
+export async function updateAlbumSettings(
+  formData: FormData
+): Promise<AlbumActionResult> {
+  const ctx = await ownedAlbumId();
+  if (!ctx) return { ok: false, error: "Sesión requerida" };
+  const { supabase, albumId } = ctx;
+
+  const title = String(formData.get("title") ?? "").trim().slice(0, 120);
+  const theme = String(formData.get("theme") ?? "sepia");
+  if (!isAlbumTheme(theme)) {
+    return { ok: false, error: "Tema inválido" };
+  }
+  const { error } = await supabase
+    .from("albums")
+    .update({
+      ...(title ? { title } : {}),
+      theme,
+      is_public: formData.get("is_public") === "on",
+    })
+    .eq("id", albumId);
+  if (error) return { ok: false, error: "No se pudo guardar" };
+  revalidatePath("/album");
+  return { ok: true };
 }

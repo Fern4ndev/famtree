@@ -2,6 +2,16 @@ import { createClient } from "@/lib/supabase/server";
 
 type Supabase = Awaited<ReturnType<typeof createClient>>;
 
+export const ALBUM_THEMES = ["sepia", "midnight", "bosque"] as const;
+export type AlbumTheme = (typeof ALBUM_THEMES)[number];
+
+export function isAlbumTheme(v: unknown): v is AlbumTheme {
+  return (
+    typeof v === "string" &&
+    (ALBUM_THEMES as readonly string[]).includes(v)
+  );
+}
+
 /** Primer álbum del usuario; lo crea (con página 1) si no existe. */
 export async function getOrCreateAlbum(
   supabase: Supabase,

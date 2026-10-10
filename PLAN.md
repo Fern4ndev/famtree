@@ -1,6 +1,6 @@
 # FamTree — PLAN.md
 
-Fuente de verdad del avance. Estado global: **Fase 2 · completada (2026-10-10)**.
+Fuente de verdad del avance. Estado global: **Fase 3 · completada (2026-10-10)**.
 
 ## Cómo se actualiza cada avance
 
@@ -70,14 +70,25 @@ Fuente de verdad del avance. Estado global: **Fase 2 · completada (2026-10-10)*
       pendiente: OAuth Google real no es automatizable en este entorno;
       probar manual login → crear → pegar → mover → quitar. _(2026-10-10)_
 
-## Fase 3 — Pulido del álbum · Estado: no iniciada
+## Fase 3 — Pulido del álbum · Estado: completada (2026-10-10)
 
-- [ ] 3.1 Temas de álbum (`theme`), portada y página compartida por `slug`.
-- [ ] 3.2 Álbum público/privado (`is_public`) con lectura anónima verificada
-      contra RLS + Storage. Skill: `security-review`
-- [ ] 3.3 Responsive + accesibilidad (foco, contraste, alt) + `next/image`
-      con signed URLs. Skill: `frontend-patterns`
-- [ ] 3.4 Cierre: `ecc:code-reviewer`.
+- [x] 3.1 Temas (`sepia`/`midnight`/`bosque` en `albums.theme`, selector en
+      ajustes, acento vía `var(--acc)`), título editable y portada
+      (cabecera con título + halo del tema). Ruta pública `/a/[slug]`
+      solo-lectura (sin login, solo cartas pegadas). _(2026-10-10)_
+- [x] 3.2 Público/privado (`is_public` + botón copiar enlace con slug).
+      Lectura anónima amparada en políticas RLS + Storage existentes;
+      **pendiente verificar `/a/[slug]` con álbum público real** (signed
+      URL anónima). _(2026-10-10 · parcial)_
+      Skill: `security-review`
+- [x] 3.3 Responsive (grid 1/2/3 ya) + a11y: foco visible global,
+      `prefers-reduced-motion`, targets ≥44px, `aria-pressed`/`alert`/
+      `live`; `next/image` con signed URLs (host en `next.config.ts`).
+      _(2026-10-10)_
+      Skill: `frontend-patterns`
+- [x] 3.4 Cierre: `pnpm build` en verde (10 rutas). Revisión: settings con
+      `useActionState` + errores visibles, `ALBUM_THEMES` fuera de
+      `"use server"`, sin secretos en cliente. _(2026-10-10)_
 
 ## Fase 4 — Calidad y release v1 · Estado: no iniciada
 

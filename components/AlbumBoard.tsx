@@ -121,7 +121,7 @@ export default function AlbumBoard({
             aria-pressed={p.id === activePage?.id}
             className={`min-h-[44px] cursor-pointer rounded-full border px-5 text-xs tracking-[0.15em] transition-all ${
               p.id === activePage?.id
-                ? "border-gold-400/60 bg-gold-500/15 text-gold-200"
+                ? "border-[var(--acc)] bg-[var(--acc-soft)] text-[var(--acc)]"
                 : "border-white/10 bg-white/5 text-white/60 hover:bg-white/10"
             }`}
           >
@@ -185,7 +185,7 @@ export default function AlbumBoard({
       {/* Página activa: slots */}
       {activePage && (
         <section aria-label={activePage.title ?? `Página ${activePage.page_number}`} className="mt-6">
-          <h2 className="font-display text-2xl text-gold-200">
+          <h2 className="font-display text-2xl text-[var(--acc)]">
             {activePage.title ?? `Página ${activePage.page_number}`}
           </h2>
           <div className="mt-4 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -199,7 +199,7 @@ export default function AlbumBoard({
                         <div
                           className={`w-full max-w-[300px] rounded-3xl transition-all ${
                             selectedId === m.id
-                              ? "ring-2 ring-gold-200 ring-offset-2 ring-offset-night-950"
+                              ? "ring-2 ring-[var(--acc)] ring-offset-2 ring-offset-night-950"
                               : ""
                           }`}
                         >
@@ -262,7 +262,7 @@ export default function AlbumBoard({
 
       {/* Bandeja */}
       <section aria-label="Bandeja sin pegar" className="mt-10">
-        <h2 className="font-display text-2xl text-gold-200">Bandeja</h2>
+        <h2 className="font-display text-2xl text-[var(--acc)]">Bandeja</h2>
         <p className="mt-1 text-sm text-white/50">
           Cartas aún sin pegar. Elige una y luego un hueco vacío.
         </p>
@@ -280,7 +280,7 @@ export default function AlbumBoard({
                 <div
                   className={`w-full max-w-[300px] rounded-3xl transition-all ${
                     selectedId === m.id
-                      ? "ring-2 ring-gold-200 ring-offset-2 ring-offset-night-950"
+                      ? "ring-2 ring-[var(--acc)] ring-offset-2 ring-offset-night-950"
                       : ""
                   }`}
                 >
@@ -298,7 +298,7 @@ export default function AlbumBoard({
                   aria-pressed={selectedId === m.id}
                   className={`min-h-[44px] cursor-pointer rounded-full border px-5 text-xs tracking-[0.15em] transition-all ${
                     selectedId === m.id
-                      ? "border-gold-400/60 bg-gold-500/15 text-gold-200"
+                      ? "border-[var(--acc)] bg-[var(--acc-soft)] text-[var(--acc)]"
                       : "border-white/10 bg-white/5 text-white/70 hover:bg-white/10"
                   }`}
                 >
