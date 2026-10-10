@@ -2,7 +2,6 @@
 
 import { useActionState } from "react";
 import ShareAlbumButton from "./ShareAlbumButton";
-import { ALBUM_THEMES } from "@/lib/members/album";
 import {
   updateAlbumSettings,
   type AlbumActionResult,
@@ -10,12 +9,10 @@ import {
 
 export default function AlbumSettings({
   title,
-  theme,
   isPublic,
   shareUrl,
 }: {
   title: string;
-  theme: string;
   isPublic: boolean;
   shareUrl: string;
 }) {
@@ -44,23 +41,6 @@ export default function AlbumSettings({
             maxLength={120}
             className="min-h-[44px] rounded-xl border border-white/10 bg-white/5 px-4 text-sm text-white focus-visible:outline-2 focus-visible:outline-gold-200"
           />
-        </div>
-        <div>
-          <label htmlFor="album-theme" className="mb-1 block text-[11px] tracking-[0.2em] text-cream-300/70">
-            TEMA
-          </label>
-          <select
-            id="album-theme"
-            name="theme"
-            defaultValue={theme}
-            className="min-h-[44px] cursor-pointer appearance-none rounded-xl border border-white/10 bg-white/5 px-4 text-sm text-white"
-          >
-            {ALBUM_THEMES.map((t) => (
-              <option key={t} value={t} className="bg-night-900">
-                {t}
-              </option>
-            ))}
-          </select>
         </div>
         <label
           htmlFor="album-public"

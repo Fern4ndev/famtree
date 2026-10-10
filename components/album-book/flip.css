@@ -1,0 +1,38 @@
+/* Spike OpenPageFlip: posicionamiento de tapas y caras. El material viene de book.css. */
+
+.flip-root {
+  position: relative;
+  height: 100dvh;
+  width: 100dvw;
+  overflow: hidden;
+  background: #02040b;
+  color: #fff;
+}
+.flip-root::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 50% 42%, var(--veil) 0%, transparent 55%),
+    radial-gradient(circle at center, rgba(0, 0, 0, 0) 40%, rgba(0, 0, 0, 0.55) 100%);
+  pointer-events: none;
+}
+.flip-stage {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: min(100dvw, 1500px);
+  margin-inline: auto;
+  padding: 64px 16px 150px;
+}
+.flip-cover,
+.flip-face {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+}
+.flip-frame {
+  margin-inline: auto;
+}

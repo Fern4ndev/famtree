@@ -1,0 +1,330 @@
+/* AlbumBook — libro 3D con CSS. Sin márgenes/paddings globales: todo por clases. */
+
+@property --turn {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+
+.book-root {
+  position: fixed;
+  inset: 0;
+  width: 100dvw;
+  height: 100dvh;
+  overflow: hidden;
+  background: #02040b;
+  color: #fff;
+}
+.book-root::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 50% 42%, var(--veil) 0%, transparent 55%),
+    radial-gradient(circle at center, rgba(0, 0, 0, 0) 40%, rgba(0, 0, 0, 0.55) 100%);
+  pointer-events: none;
+}
+
+.book-stage {
+  /* Cara abierta = 50dvw: el spread ocupa el 100 % del ancho. */
+  --page-w: min(50dvw, calc(100dvh * 0.72));
+  --page-h: calc(var(--page-w) / 0.72);
+  --u: calc(var(--page-w) / 100);
+  position: absolute;
+  inset: 0;
+  perspective: calc(var(--page-w) * 3);
+}
+
+.book-spread {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: calc(var(--page-w) * 2);
+  height: var(--page-h);
+  transform:
+    translate(-50%, -50%)
+    translateX(calc(var(--shift, 0) * var(--page-w)));
+  transform-style: preserve-3d;
+}
+
+.book-contact-shadow {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: calc(var(--page-w) * 2.15);
+  height: calc(var(--page-h) * 1.04);
+  transform: translate(-50%, -46%);
+  background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.65) 30%, transparent 70%);
+  filter: blur(calc(var(--u) * 3));
+  pointer-events: none;
+}
+
+/* ---- Hoja ---- */
+.leaf {
+  --turn: 0;
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: var(--page-w);
+  height: var(--page-h);
+  transform-origin: left center;
+  transform-style: preserve-3d;
+  transform:
+    translateZ(calc(0.4px * var(--i, 0) * (2 * var(--turn) - 1)))
+    rotateY(calc(var(--turn) * -180deg));
+  transition: --turn 900ms cubic-bezier(0.45, 0.05, 0.2, 1);
+  will-change: transform;
+}
+.leaf[data-dragging="true"] {
+  transition: none;
+}
+.leaf__face {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: calc(var(--u) * 1.2);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+.leaf__face--back {
+  transform: rotateY(180deg);
+}
+.leaf__shade {
+  position: absolute;
+  inset: 0;
+  background: #000;
+  opacity: calc(sin(var(--turn) * 180deg) * 0.38);
+  pointer-events: none;
+}
+.leaf__sheen {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    105deg,
+    transparent calc(var(--turn) * 100% - 30%),
+    rgba(255, 255, 255, 0.22) calc(var(--turn) * 100%),
+    transparent calc(var(--turn) * 100% + 30%)
+  );
+  pointer-events: none;
+}
+
+/* ---- Tapa: cuero envejecido + oro ---- */
+.book-cover {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 0 calc(var(--u) * 3) calc(var(--u) * 3) 0;
+  background:
+    radial-gradient(circle at 18% 12%, rgba(0, 0, 0, 0.35) 0%, transparent 28%),
+    radial-gradient(circle at 85% 70%, rgba(0, 0, 0, 0.3) 0%, transparent 30%),
+    radial-gradient(circle at 60% 90%, rgba(0, 0, 0, 0.28) 0%, transparent 24%),
+    repeating-linear-gradient(48deg, transparent 0 5px, rgba(0, 0, 0, 0.05) 5px 6px),
+    linear-gradient(135deg, var(--leather-1) 0%, var(--leather-2) 42%, var(--leather-3) 78%, var(--leather-4) 100%);
+  box-shadow:
+    inset calc(var(--u) * 1) calc(var(--u) * 1) calc(var(--u) * 2) rgba(208, 160, 120, 0.28),
+    inset calc(var(--u) * -1.5) calc(var(--u) * -1.5) calc(var(--u) * 4) rgba(0, 0, 0, 0.6);
+}
+.book-cover--back {
+  border-radius: calc(var(--u) * 3) 0 0 calc(var(--u) * 3);
+}
+.book-cover__art {
+  position: absolute;
+  inset: 0;
+}
+.book-cover__art img {
+  border-radius: inherit;
+}
+.book-cover__frame {
+  position: absolute;
+  inset: calc(var(--u) * 5);
+  border: calc(var(--u) * 0.7) solid color-mix(in srgb, var(--metal-2) 80%, transparent);
+  outline: calc(var(--u) * 0.35) solid color-mix(in srgb, var(--metal-hi) 60%, transparent);
+  outline-offset: calc(var(--u) * 1.2);
+  border-radius: calc(var(--u) * 1.5);
+  pointer-events: none;
+}
+.book-cover__corner {
+  position: absolute;
+  width: calc(var(--u) * 13);
+  height: calc(var(--u) * 13);
+  color: var(--metal-2);
+  opacity: 0.9;
+  filter: drop-shadow(0 1px 0 rgba(0, 0, 0, 0.5));
+  pointer-events: none;
+}
+.book-cover__medallion {
+  width: calc(var(--u) * 34);
+  height: calc(var(--u) * 34);
+  filter: drop-shadow(0 calc(var(--u) * 0.8) calc(var(--u) * 1.2) rgba(0, 0, 0, 0.55));
+}
+.book-cover__title {
+  font-family: var(--font-display);
+  background: linear-gradient(180deg, var(--metal-hi) 20%, var(--metal-1) 45%, var(--metal-4) 75%, var(--metal-lo) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 calc(var(--u) * 0.4) 0 rgba(255, 255, 255, 0.35))
+    drop-shadow(0 calc(var(--u) * -0.4) calc(var(--u) * 0.6) rgba(0, 0, 0, 0.6));
+}
+.book-cover__sheen {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(115deg, transparent 30%, rgba(255, 255, 255, 0.28) 48%, transparent 62%);
+  background-size: 280% 100%;
+  animation: book-sheen 7s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes book-sheen {
+  0%, 55% { background-position: 120% 0; }
+  85%, 100% { background-position: -20% 0; }
+}
+.book-cover__float {
+  animation: book-float 6s ease-in-out infinite;
+}
+@keyframes book-float {
+  0%, 100% { translate: 0 0; }
+  50% { translate: 0 calc(var(--u) * -4); }
+}
+
+/* ---- Cara de página: pergamino amarillento con fibra ---- */
+.book-face {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background:
+    radial-gradient(circle at 12% 8%, rgba(75, 41, 29, 0.16) 0%, transparent 30%),
+    radial-gradient(circle at 88% 92%, rgba(75, 41, 29, 0.18) 0%, transparent 32%),
+    repeating-linear-gradient(0deg, transparent 0 3px, rgba(128, 97, 59, 0.1) 3px 4px),
+    linear-gradient(165deg, var(--page-light) 0%, var(--page-base) 55%, var(--page-mid) 100%);
+  box-shadow: inset 0 0 calc(var(--u) * 7) rgba(59, 33, 20, 0.5);
+  color: var(--ink);
+}
+.book-face__fold {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+}
+.book-face__fold--left {
+  background-image: linear-gradient(to right, rgba(0, 0, 0, 0.35) 0%, transparent 12%);
+}
+.book-face__fold--right {
+  background-image: linear-gradient(to left, rgba(0, 0, 0, 0.35) 0%, transparent 12%);
+}
+.book-face__filigree {
+  position: absolute;
+  inset: calc(var(--u) * 3.2);
+  border: calc(var(--u) * 0.45) solid color-mix(in srgb, var(--metal-4) 45%, transparent);
+  border-radius: calc(var(--u) * 1);
+  pointer-events: none;
+}
+
+/* ---- Hueco ---- */
+.book-slot {
+  border-radius: calc(var(--u) * 2);
+  background: color-mix(in srgb, var(--metal-lo) 22%, transparent);
+  box-shadow:
+    inset 0 calc(var(--u) * 0.8) calc(var(--u) * 2) rgba(0, 0, 0, 0.45),
+    0 1px 0 rgba(255, 255, 255, 0.25);
+  color: var(--ink);
+}
+button.book-slot {
+  cursor: pointer;
+  transition: box-shadow 200ms ease, transform 200ms ease;
+}
+button.book-slot:hover {
+  box-shadow:
+    inset 0 calc(var(--u) * 0.8) calc(var(--u) * 2) rgba(0, 0, 0, 0.45),
+    0 0 0 calc(var(--u) * 0.8) color-mix(in srgb, var(--metal-hi) 70%, transparent);
+}
+.book-slot--land {
+  animation: book-land 600ms ease-out;
+}
+@keyframes book-land {
+  0% { transform: scale(0.97); box-shadow: 0 0 0 calc(var(--u) * 3) rgba(255, 243, 207, 0.9); }
+  100% { transform: scale(1); }
+}
+
+/* Aplana la carta holo dentro del libro (evita recortes por translateZ) */
+.book-face .holo-card__translater {
+  transform: none !important;
+  transition: transform 200ms ease-out;
+}
+.book-face .holo-card__shine {
+  mix-blend-mode: normal;
+  opacity: 0;
+}
+.book-face .holo-card__rotator:hover + * .holo-card__shine,
+.book-face .holo-card__rotator:hover .holo-card__shine,
+.book-face button:hover .holo-card__shine {
+  opacity: var(--card-opacity);
+  mix-blend-mode: color-dodge;
+}
+
+/* ---- Canto de hojas ---- */
+.page-block {
+  background: repeating-linear-gradient(
+    to right,
+    var(--page-light) 0px,
+    var(--page-light) 1px,
+    var(--page-dark) 2px,
+    var(--page-base) 3px
+  );
+}
+
+/* ---- Lomo con nervaduras y franjas doradas ---- */
+.book-spine {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  height: 100%;
+  width: calc(var(--u) * 5);
+  transform: translateX(-50%) translateZ(-2px);
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      transparent 0 calc(var(--u) * 9),
+      color-mix(in srgb, var(--metal-2) 75%, transparent) calc(var(--u) * 9) calc(var(--u) * 10.2),
+      transparent calc(var(--u) * 10.2) calc(var(--u) * 22)
+    ),
+    linear-gradient(90deg, var(--leather-4) 0%, var(--leather-3) 45%, var(--leather-4) 100%);
+  box-shadow:
+    calc(var(--u) * -1) 0 calc(var(--u) * 2) rgba(0, 0, 0, 0.55),
+    calc(var(--u) * 1) 0 calc(var(--u) * 2) rgba(0, 0, 0, 0.55);
+}
+
+/* ---- Grips ---- */
+.page-grip {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 18%;
+  z-index: 5;
+  touch-action: none;
+  cursor: grab;
+}
+.page-grip:active {
+  cursor: grabbing;
+}
+
+/* ---- Fantasma de arrastre ---- */
+.book-ghost {
+  position: fixed;
+  z-index: 50;
+  width: 120px;
+  pointer-events: none;
+  transform: translate(-50%, -60%) rotate(4deg);
+  filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.6));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .leaf {
+    transition: none;
+  }
+  .book-cover__sheen,
+  .book-cover__float,
+  .book-slot--land {
+    animation: none;
+  }
+}
