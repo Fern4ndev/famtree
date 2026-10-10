@@ -61,7 +61,7 @@ export default async function AlbumPage() {
 
   return (
     <>
-      <NavBar />
+      
       <main
         className={`album-theme-${theme} relative flex min-h-screen flex-col items-center overflow-hidden bg-night-950 px-6 py-24 text-white`}
       >
