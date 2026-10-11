@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
-import { getOrCreateAlbum, isAlbumTheme } from "@/lib/members/album";
+import { getOrCreateAlbum } from "@/lib/members/album";
 
 export interface AlbumActionResult {
   ok: boolean;
@@ -41,7 +41,8 @@ export async function placeMember(
     .eq("album_id", albumId)
     .single();
   if (!member || !page) return { ok: false, error: "Carta o página inválida" };
-  if (slot < 1 || slot > (page.slots as number)) {
+  // 9 huecos fijos por cara (la columna `slots` queda informativa).
+  if (slot < 1 || slot > 9) {
     return { ok: false, error: "Hueco inválido" };
   }
 
@@ -120,15 +121,10 @@ export async function updateAlbumSettings(
   const { supabase, albumId } = ctx;
 
   const title = String(formData.get("title") ?? "").trim().slice(0, 120);
-  const theme = String(formData.get("theme") ?? "sepia");
-  if (!isAlbumTheme(theme)) {
-    return { ok: false, error: "Tema inválido" };
-  }
   const { error } = await supabase
     .from("albums")
     .update({
       ...(title ? { title } : {}),
-      theme,
       is_public: formData.get("is_public") === "on",
     })
     .eq("id", albumId);

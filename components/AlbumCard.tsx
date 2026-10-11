@@ -23,6 +23,10 @@ export interface AlbumCardProps {
   maskUrl?: string;
   /** PNG/WEBP de la lámina metálica (--foil) */
   foilUrl?: string;
+  /** Carga ansiosa (LCP). Por defecto diferida para no saturar la red. */
+  eager?: boolean;
+  /** Si es false, desactiva tilt y foco (vecinas del spread visible). */
+  interactive?: boolean;
   className?: string;
 }
 
@@ -36,18 +40,36 @@ function adjust(value: number, fromMin: number, fromMax: number, toMin: number, 
   return round(toMin + ((value - fromMin) * (toMax - toMin)) / (fromMax - fromMin));
 }
 
+function CardImage({ src, alt, eager }: { src: string; alt: string; eager: boolean }) {
+  return (
+    <Image
+      src={src}
+      alt={alt}
+      fill
+      sizes="300px"
+      className="holo-card__art"
+      priority={eager}
+      loading={eager ? "eager" : "lazy"}
+    />
+  );
+}
+
 export default function AlbumCard({
   name,
   imageUrl,
   rarity = "common",
   maskUrl,
   foilUrl,
+  eager = false,
+  interactive = true,
   className = "",
 }: AlbumCardProps) {
   const cardRef = useRef<HTMLDivElement>(null);
   const rotatorRef = useRef<HTMLButtonElement>(null);
 
-  const handleMove = useCallback((clientX: number, clientY: number) => {
+  const handleMove = useCallback(
+    (clientX: number, clientY: number) => {
+      if (!interactive) return;
     const card = cardRef.current;
     const rotator = rotatorRef.current;
     if (!card || !rotator) return;
@@ -80,9 +102,10 @@ export default function AlbumCard({
     card.style.setProperty("--pointer-from-center", `${distFromCenter}`);
     card.style.setProperty("--card-opacity", "1");
     card.style.setProperty("--card-scale", "1.05");
-  }, []);
+  }, [interactive]);
 
   const resetCard = useCallback(() => {
+    if (!interactive) return;
     const card = cardRef.current;
     if (!card) return;
     card.classList.remove("interacting");
@@ -95,7 +118,7 @@ export default function AlbumCard({
     card.style.setProperty("--pointer-from-center", "0");
     card.style.setProperty("--card-opacity", "0");
     card.style.setProperty("--card-scale", "1");
-  }, []);
+  }, [interactive]);
 
   const foilStyle = {
     ...(maskUrl ? { ["--mask" as string]: `url(${maskUrl})` } : {}),
@@ -110,32 +133,43 @@ export default function AlbumCard({
         data-rarity={rarity}
       >
         <div className="holo-card__translater">
-          <button
-            ref={rotatorRef}
-            type="button"
-            className="holo-card__rotator"
-            aria-label={`Carta de ${name}`}
-            onPointerMove={(e) => handleMove(e.clientX, e.clientY)}
-            onPointerLeave={resetCard}
-            onTouchMove={(e) => {
-              const t = e.touches[0];
-              if (t) handleMove(t.clientX, t.clientY);
-            }}
-            onTouchEnd={resetCard}
-          >
-            <div className="holo-card__front" style={foilStyle}>
-              <Image
-                src={imageUrl}
-                alt={`Foto de ${name}`}
-                fill
-                sizes="300px"
-                className="holo-card__art"
-                priority
-              />
-              <div className="holo-card__shine" />
-              <div className="holo-card__glare" />
+          {interactive ? (
+            <button
+              ref={rotatorRef}
+              type="button"
+              className="holo-card__rotator"
+              aria-label={`Carta de ${name}`}
+              onPointerMove={(e) => handleMove(e.clientX, e.clientY)}
+              onPointerLeave={resetCard}
+              onTouchMove={(e) => {
+                const t = e.touches[0];
+                if (t) handleMove(t.clientX, t.clientY);
+              }}
+              onTouchEnd={resetCard}
+            >
+              <div className="holo-card__front" style={foilStyle}>
+                <CardImage
+                  src={imageUrl}
+                  alt={`Foto de ${name}`}
+                  eager={eager}
+                />
+                <div className="holo-card__shine" />
+                <div className="holo-card__glare" />
+              </div>
+            </button>
+          ) : (
+            <div className="holo-card__rotator" role="img" aria-label={`Carta de ${name}`}>
+              <div className="holo-card__front" style={foilStyle}>
+                <CardImage
+                  src={imageUrl}
+                  alt=""
+                  eager={eager}
+                />
+                <div className="holo-card__shine" />
+                <div className="holo-card__glare" />
+              </div>
             </div>
-          </button>
+          )}
         </div>
       </div>
     </div>
