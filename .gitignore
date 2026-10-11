@@ -15,6 +15,7 @@
 
 # local diagnostics
 /.spike-shots
+/.agents
 
 # next.js
 /.next/
