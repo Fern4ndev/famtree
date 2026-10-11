@@ -37,7 +37,9 @@ export default function NewMemberForm() {
       return;
     }
     setErrors((e) => {
-      const { photo, ...rest } = e;
+      if (!("photo" in e)) return e;
+      const rest = { ...e };
+      delete rest.photo;
       return rest;
     });
     setPreviewUrl(URL.createObjectURL(file));

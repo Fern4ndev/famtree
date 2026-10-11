@@ -101,6 +101,82 @@ Fuente de verdad del avance. Estado global: **Fase 3 · completada (2026-10-10)*
 - [ ] 4.4 Deploy + checklist (envs, OAuth Google en prod, bucket, migraciones
       aplicadas). Estado global → **v1 liberada**.
 
+## Fase 3b — Álbum libro (AlbumBook) · Estado: en curso (2026-10-10)
+
+Plan detallado: `ALBUMBOOK_PLAN.md`.
+
+- [x] 0 Preparación: vitest + RTL + jsdom + coverage, scripts `test`/`test:cov`,
+      `vitest.config.ts` (alias `@`, umbral 80%), carpetas, tipos en
+      `lib/album-book/types.ts` (re-exportados por `AlbumBoard`).
+- [x] 2 Lógica pura `lib/album-book/` (TDD: 33 tests, cobertura 98%) +
+      `bookReducer`. Nota: `turnFromPointer` sin `dir` (el giro se mide
+      siempre igual; test inicial corregido).
+- [x] 1+3+5 Shell 100dvh (`AlbumBook`, `Leaf` con `--turn`, `PageFace`,
+      tapas doradas `BookCover`/`BookBack`, lomo, cantos con grosor variable,
+      sombras `sin()`, temas con `--metal-*`/`--ink`). `AlbumCard` con
+      `eager`/`interactive` (sin `priority` global).
+- [x] 4 Teclado completo + drag con snap por velocidad + `?p=` y
+      localStorage. Pendiente: rueda, corner-peel.
+- [x] 6 Bandeja colapsable + clic-para-pegar + drag con fantasma
+      (`elementFromPoint`) + pulso al aterrizar; `placeMember`/`unplaceMember`
+      sin cambios. Pendiente: vuelo FLIP completo.
+- [x] 7 `SettingsDialog` (Radix, reusa `AlbumSettings`+`ShareAlbumButton`),
+      cambio de tema, hoja nueva (+) con salto, índice (select) + controles.
+      Sin `NavBar`/WebGL en `/album`.
+- [x] 10 `/a/[slug]` en modo readonly. `AlbumBoard` se conserva como
+      fallback (Fase 9 decidirá "ver como lista").
+- [ ] 8 Modo una página en móvil (hoy: spread escalado, usable pero pequeño).
+- [ ] 9 Auditoría contraste/Lighthouse + RTL de componentes + Safari/iOS real.
+- [ ] 10 Cierre: E2E Playwright (requiere Supabase local), eliminar
+      `AlbumBoard` si se adopta el libro, `ecc:security-reviewer`.
+- Cierre parcial (2026-10-10, rev. 2): `pnpm build` verde, `pnpm test` 33/33,
+  `pnpm eslint` limpio en `album-book`/`album`/`members`.
+  Incidente: `lib/album-book/` desapareció del disco (archivos sin commitear)
+  y se reconstruyó idéntica desde el historial de sesión. Lección: commitear
+  cada fase (ver Fase 4).
+- Cambio 2026-10-10 (fuera del plan original): tema único grimorio medieval
+  según spec visual (cuero #70402B, oro #B89A55/#BDA45C, pergamino #C9A56C).
+  Eliminado el cambio de tema (sin migración, columna intacta): fuera
+  `ALBUM_THEMES`/`isAlbumTheme`, selector en ajustes y prop `theme`.
+  Tapa con medallón y esquineras SVG, lomo con nervaduras, hojas con fibra.
+  Spread abierto a todo el ancho (`--page-w: min(50dvw, 100dvh·0.72)`).
+- Spike OpenPageFlip (rama `spike/openpageflip`, 2026-10-10): instalados
+  `@openpageflip/core` + `@openpageflip/react` 0.7.0 exactos, React 19.3.0
+  (peer `^19.2.8`). Ruta `/spike` (protegida): tapas duras PNG, cada
+  `album_page` = 1 cara (slots 1…9, `gridFor` ampliado a 3×3), bandeja y
+  actions reutilizadas, `layout="auto"` (una página en móvil).
+- Limpieza + carta estática (2026-10-10): eliminados `AlbumBoard.tsx`,
+  `paging/reducer/thickness/gesture` (+ tests), `splitSlots`,
+  `app/components/`, `vino.jpg`. La carta pegada es solo la carta:
+  sin tilt, sin nombre, sin MOVER/QUITAR. Interacción invisible:
+  clic = elegir para mover (anillo), clic de nuevo = a la bandeja.
+  `pnpm build` verde, tests 3/3 (solo `gridFor`), eslint limpio en lo nuevo.
+- Bandeja lateral derecha + 9 fijos + cierre (2026-10-10): `TraySidebar`
+  plegable a la derecha (elimina `Tray.tsx` y `.book-tray`); caras sin
+  título, 9 huecos fijos 3×3 (`slots` informativo, `placeMember` valida
+  1…9); libro más alto (`BOTTOM_CHROME` 100→84). Cierre: el arrastre
+  necesita cruzar el lomo (gesto real); además teclado global
+  (←/→/Home/End/Escape) y botón ←. Slots y cartas son `div` con rol
+  para no bloquear el arrastre (los `<button>` lo inhibían).
+  Verificado con captura. `pnpm build` verde, tests 3/3.
+- Cromado mínimo + 9 fijos (2026-10-10): fuera botón +hoja y nav de páginas
+  (navegación por arrastre/teclado/botones de tapa); caras sin título;
+  huecos con más gap y aire (3×3 respirado); vacío siempre "VACÍO".
+  Libro más alto (`BOTTOM_CHROME` 84→40, bandeja lateral hasta abajo).
+  `pnpm build` verde, tests 3/3, eslint limpio en lo nuevo.
+- Fix alto colapsado (2026-10-10, medido en 1440×900, 1366×768 y 390×844):
+  el alto lo manda el viewport (`maxWidth = (h-284)·0.72` por página),
+  `minWidth={280}` + `layout single <640px` (patrón oficial Responsive) y
+  libro centrado (`margin-inline: auto`).
+  Causa raíz del "colapso" visto: mi `useViewport` devolvía objeto nuevo en
+  cada snapshot → bucle infinito → React desmontaba el árbol.
+- Fix verificado con captura (2026-10-10): las caras salían transparentes
+  porque `.book-face__fold--*` (`background-image`) pisaba el `background`
+  con pergamino de `.book-face` (igual especificidad, orden posterior).
+  El pliegue ahora es overlay propio (`book-face__fold` + `position:relative`
+  en la cara). Ruta `/spike-preview` (mock, pública) + `scripts/spike-shot.mjs`
+  como harness visual.
+
 ## Fase 5 — Árbol familiar (v2 futura) · Estado: diferida
 
 Contrato (no romper en Fases 0–4): cartas siempre con `album_id`;

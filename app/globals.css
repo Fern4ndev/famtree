@@ -146,6 +146,7 @@
 }
 
 .holo-card__front {
+  position: relative;
   opacity: 1;
   transition: opacity 0.33s ease-out;
   transform: translate3d(0px, 0px, 0.01px);
@@ -393,23 +394,21 @@ body {
 }
 
 /* ==========================================================================
-   FamTree — temas de álbum (columna `albums.theme`).
-   Los títulos y acentos usan var(--acc); el dorado queda como base sepia.
+   FamTree — tema único: grimorio medieval (cuero envejecido + oro + pergamino).
+   Variables globales (las usan el libro propio y el spike): no hay selector
+   de tema. (La columna `albums.theme` queda sin uso, sin migración.)
    ========================================================================== */
-.album-theme-sepia {
-  --acc: #f3d28c;
-  --acc-soft: rgba(215, 185, 142, 0.15);
-  --veil: rgba(255, 220, 160, 0.1);
-}
-.album-theme-midnight {
-  --acc: #bcd2ff;
-  --acc-soft: rgba(150, 180, 255, 0.15);
-  --veil: rgba(150, 180, 255, 0.1);
-}
-.album-theme-bosque {
-  --acc: #c4e6c8;
-  --acc-soft: rgba(150, 210, 165, 0.15);
-  --veil: rgba(150, 210, 165, 0.1);
+:root {
+  --acc: #d9bc6a;
+  --acc-soft: rgba(217, 188, 106, 0.15);
+  --veil: rgba(200, 165, 108, 0.12);
+  --metal-hi: #e8d189; --metal-1: #bda45c; --metal-2: #b89a55;
+  --metal-3: #80613b; --metal-4: #4b291d; --metal-lo: #241209;
+  --ink: #2b1a10;
+  --page-base: #c9a56c; --page-light: #e0c38e;
+  --page-mid: #a98550; --page-dark: #80613b;
+  --leather-1: #985d3d; --leather-2: #70402b;
+  --leather-3: #4b291d; --leather-4: #3a2119;
 }
 
 /* Foco visible global para navegación por teclado */
