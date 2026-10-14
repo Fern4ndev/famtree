@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import AlbumCard from "@/components/AlbumCard";
+import PhotoCropper from "@/components/PhotoCropper";
 import { createMember } from "./actions";
 import {
   ACCEPTED_PHOTO_TYPES,
@@ -18,14 +19,19 @@ const errorCls = "mt-1 text-xs text-red-300";
 
 export default function NewMemberForm() {
   const router = useRouter();
+  const photoInputRef = useRef<HTMLInputElement>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [saving, setSaving] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [previewName, setPreviewName] = useState("Tu familiar");
+  const [originalUrl, setOriginalUrl] = useState<string | null>(null);
+  const [cropOpen, setCropOpen] = useState(false);
+  const [croppedFile, setCroppedFile] = useState<File | null>(null);
 
   const onPhotoChange = (file: File | undefined) => {
     if (!file) {
       setPreviewUrl(null);
+      setCroppedFile(null);
       return;
     }
     if (!ACCEPTED_PHOTO_TYPES.includes(file.type)) {
@@ -42,14 +48,41 @@ export default function NewMemberForm() {
       delete rest.photo;
       return rest;
     });
-    setPreviewUrl(URL.createObjectURL(file));
+    setCroppedFile(null);
+    setOriginalUrl((prev) => {
+      if (prev) URL.revokeObjectURL(prev);
+      return null;
+    });
+    const url = URL.createObjectURL(file);
+    setOriginalUrl(url);
+    setPreviewUrl(url);
+    setCropOpen(true);
+  };
+
+  const onApplyCrop = (file: File) => {
+    if (file.size > MAX_PHOTO_BYTES) {
+      setErrors((e) => ({ ...e, photo: "Máximo 2 MB" }));
+      return;
+    }
+    setErrors((e) => {
+      if (!("photo" in e)) return e;
+      const rest = { ...e };
+      delete rest.photo;
+      return rest;
+    });
+    setCroppedFile(file);
+    setPreviewUrl((prev) => {
+      if (prev && prev !== originalUrl) URL.revokeObjectURL(prev);
+      return URL.createObjectURL(file);
+    });
+    setCropOpen(false);
   };
 
   const handleSubmit = async (formData: FormData) => {
     setSaving(true);
     setErrors({});
     try {
-      const result = await createMember(formData);
+      if (croppedFile) formData.set("photo", croppedFile, "foto.jpg");
       if (result.ok && result.memberId) {
         router.push(`/card/${result.memberId}`);
       } else {
@@ -179,6 +212,7 @@ export default function NewMemberForm() {
               FOTO * (WEBP/JPG/PNG, MÁX 2 MB)
             </label>
             <input
+              ref={photoInputRef}
               id="photo"
               name="photo"
               type="file"
@@ -188,6 +222,15 @@ export default function NewMemberForm() {
               onChange={(e) => onPhotoChange(e.target.files?.[0])}
             />
             {errors.photo && <p className={errorCls}>{errors.photo}</p>}
+            {originalUrl && (
+              <button
+                type="button"
+                onClick={() => setCropOpen(true)}
+                className="mt-2 min-h-[44px] cursor-pointer rounded-full border border-white/15 px-5 text-[11px] tracking-[0.2em] text-white/80 hover:bg-white/5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold-200"
+              >
+                {croppedFile ? "REENCUADRAR" : "ENCUADRAR"}
+              </button>
+            )}
           </div>
         </div>
 
@@ -218,6 +261,12 @@ export default function NewMemberForm() {
           </div>
         )}
       </aside>
+      <PhotoCropper
+        src={originalUrl}
+        open={cropOpen}
+        onOpenChange={setCropOpen}
+        onApply={onApplyCrop}
+      />
     </div>
   );
 }
