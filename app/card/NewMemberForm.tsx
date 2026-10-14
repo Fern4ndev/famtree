@@ -48,11 +48,16 @@ export default function NewMemberForm() {
   const handleSubmit = async (formData: FormData) => {
     setSaving(true);
     setErrors({});
-    const result = await createMember(formData);
-    if (result.ok && result.memberId) {
-      router.push(`/card/${result.memberId}`);
-    } else {
-      setErrors(result.errors ?? { _form: "Error desconocido" });
+    try {
+      const result = await createMember(formData);
+      if (result.ok && result.memberId) {
+        router.push(`/card/${result.memberId}`);
+      } else {
+        setErrors(result.errors ?? { _form: "Error desconocido" });
+      }
+    } catch {
+      setErrors({ _form: "No se pudo contactar al servidor. Revisa tu conexión e inténtalo de nuevo." });
+    } finally {
       setSaving(false);
     }
   };

@@ -5,6 +5,12 @@ import AlbumCard from "@/components/AlbumCard";
 import type { BoardMember } from "@/lib/album-book/types";
 
 /** Bandeja lateral derecha: cartas sin pegar. Se pliega sobre el libro. */
+function formatYears(m: { birth_year: number | null; death_year: number | null }) {
+  if (m.birth_year == null && m.death_year == null) return null;
+  if (m.birth_year != null && m.death_year != null) return `${m.birth_year}–${m.death_year}`;
+  if (m.birth_year != null) return `${m.birth_year}`;
+  return `†${m.death_year}`;
+}
 export default function TraySidebar({
   members,
   selectedId,
@@ -49,6 +55,7 @@ export default function TraySidebar({
             {members.map((m) => (
               <li key={m.id} className="flex flex-col items-center gap-1.5">
                 <div
+                  title={`Carta de ${m.full_name}${formatYears(m) ? ` (${formatYears(m)})` : ""}`}
                   className={`w-full rounded-xl transition-all ${
                     selectedId === m.id ? "ring-2 ring-[var(--acc)] ring-offset-2 ring-offset-black" : ""
                   }`}
@@ -62,6 +69,10 @@ export default function TraySidebar({
                 </div>
                 <p className="w-full truncate text-center text-[11px] text-white/80">
                   {m.full_name}
+                  {formatYears(m) ? ` · ${formatYears(m)}` : ""}
+                </p>
+                <p className="text-[10px] tracking-[0.2em] text-white/45" aria-label={`Rareza ${m.rarity}`}>
+                  {m.rarity.toUpperCase()}
                 </p>
                 <button
                   onClick={() => onSelect(selectedId === m.id ? null : m.id)}

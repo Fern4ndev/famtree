@@ -52,7 +52,12 @@ export async function createMember(
     return { ok: false, errors };
   }
 
-  const albumId = await getOrCreateAlbum(supabase, auth.user.id);
+  let albumId: string;
+  try {
+    albumId = await getOrCreateAlbum(supabase, auth.user.id);
+  } catch {
+    return { ok: false, errors: { _form: "No se pudo preparar tu álbum" } };
+  }
   const { data: member, error: insertError } = await supabase
     .from("members")
     .insert({ album_id: albumId, ...parsed.data })

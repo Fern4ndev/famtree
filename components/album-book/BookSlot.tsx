@@ -87,6 +87,7 @@ export default function BookSlot({
       role="button"
       tabIndex={0}
       aria-pressed={selected}
+      title={`Carta de ${member.full_name}`}
       aria-label={`Carta de ${member.full_name}${selected ? ", elegida: pulsa para devolverla a la bandeja" : ", pulsa para moverla"}`}
       onClick={() => {
         if (selected) onUnplace(member.id);

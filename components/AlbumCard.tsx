@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useRef } from "react";
+import { useCallback, useRef, useState } from "react";
 import Image from "next/image";
 
 /**
@@ -41,15 +41,26 @@ function adjust(value: number, fromMin: number, fromMax: number, toMin: number, 
 }
 
 function CardImage({ src, alt, eager }: { src: string; alt: string; eager: boolean }) {
+  const [failed, setFailed] = useState(false);
+  if (failed || !src) {
+    return (
+      <div className="holo-card__art flex items-center justify-center bg-[var(--page-dark)]">
+        <span className="font-display text-[10px] tracking-[0.25em] text-[var(--page-light)]">
+          VACÍO
+        </span>
+      </div>
+    );
+  }
   return (
     <Image
       src={src}
       alt={alt}
       fill
-      sizes="300px"
+      sizes="(max-width: 640px) 30vw, 160px"
       className="holo-card__art"
       priority={eager}
       loading={eager ? "eager" : "lazy"}
+      onError={() => setFailed(true)}
     />
   );
 }
@@ -70,6 +81,11 @@ export default function AlbumCard({
   const handleMove = useCallback(
     (clientX: number, clientY: number) => {
       if (!interactive) return;
+      if (
+        typeof window !== "undefined" &&
+        window.matchMedia?.("(prefers-reduced-motion: reduce)").matches
+      )
+        return;
     const card = cardRef.current;
     const rotator = rotatorRef.current;
     if (!card || !rotator) return;
@@ -129,7 +145,7 @@ export default function AlbumCard({
     <div className={`mx-auto w-full max-w-[300px] ${className}`}>
       <div
         ref={cardRef}
-        className={`holo-card ${rarity} masked`}
+        className={`holo-card ${rarity}${maskUrl ? " masked" : ""}`}
         data-rarity={rarity}
       >
         <div className="holo-card__translater">
@@ -162,7 +178,7 @@ export default function AlbumCard({
               <div className="holo-card__front" style={foilStyle}>
                 <CardImage
                   src={imageUrl}
-                  alt=""
+                  alt={`Foto de ${name}`}
                   eager={eager}
                 />
                 <div className="holo-card__shine" />
