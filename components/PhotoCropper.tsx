@@ -21,21 +21,33 @@ export default function PhotoCropper({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const imgRef = useRef<HTMLImageElement | null>(null);
   const dragRef = useRef<{ x: number; y: number } | null>(null);
+  const loadedSrc = useRef<string | null>(null);
   const [ready, setReady] = useState(false);
+  const [loadedKey, setLoadedKey] = useState<string | null>(null);
   const [zoom, setZoom] = useState(1);
   const [pan, setPan] = useState({ x: 0, y: 0 });
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    setReady(false);
-    setZoom(1);
-    setPan({ x: 0, y: 0 });
     if (!src || !open) return;
+    const canvas = canvasRef.current;
+    canvas?.getContext("2d")?.clearRect(0, 0, canvas.width, canvas.height);
     const img = new Image();
-    imgRef.current = img;
-    img.onload = () => setReady(true);
+    let cancelled = false;
+    img.onload = () => {
+      if (cancelled) return;
+      imgRef.current = img;
+      if (loadedSrc.current !== src) {
+        loadedSrc.current = src;
+        setLoadedKey(src);
+        setZoom(1);
+        setPan({ x: 0, y: 0 });
+      }
+      setReady(true);
+    };
     img.src = src;
     return () => {
+      cancelled = true;
       imgRef.current = null;
     };
   }, [src, open]);
@@ -204,7 +216,9 @@ export default function PhotoCropper({
           </div>
 
           <p aria-live="polite" role="status" className="sr-only">
-            {ready ? `Zoom ${Math.round(zoom * 100)} por ciento` : "Cargando foto"}
+            {ready && loadedKey === src
+              ? `Zoom ${Math.round(zoom * 100)} por ciento`
+              : "Cargando foto"}
           </p>
 
           <div className="mt-5 grid grid-cols-2 gap-3">
@@ -218,7 +232,7 @@ export default function PhotoCropper({
             </Dialog.Close>
             <button
               type="button"
-              disabled={!ready || busy}
+              disabled={busy || !(ready && loadedKey === src)}
               onClick={apply}
               className="min-h-[48px] cursor-pointer rounded-full bg-gradient-to-b from-gold-200 to-gold-500 text-xs font-medium tracking-[0.2em] text-black hover:scale-[1.01] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold-200 disabled:cursor-wait disabled:opacity-70"
             >

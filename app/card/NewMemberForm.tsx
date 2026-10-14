@@ -83,6 +83,7 @@ export default function NewMemberForm() {
     setErrors({});
     try {
       if (croppedFile) formData.set("photo", croppedFile, "foto.jpg");
+      const result = await createMember(formData);
       if (result.ok && result.memberId) {
         router.push(`/card/${result.memberId}`);
       } else {
